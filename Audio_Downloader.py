@@ -3,8 +3,8 @@ from mutagen.mp3 import MP3
 from mutagen.id3 import ID3,APIC,error
 from pytube import Playlist,YouTube
 
-audio_path="c:/users/joshu/documents/temp"
-cover_path="c:/users/joshu/documents/temp"
+audio_path=""
+cover_path=""
 blocked_chars='\/:*?"<>|'
 unblocked_chars="⧵∕;＊？“←→⸡"
 count=0
