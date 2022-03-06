@@ -1,4 +1,4 @@
-import yt_dlp, os, wget
+import yt_dlp, wget, os
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3,APIC,error
 from pytube import Playlist,YouTube
@@ -6,11 +6,12 @@ from pytube import Playlist,YouTube
 audio_path=""
 cover_path=""
 blocked_chars='\/:*?"<>|'
-unblocked_chars="⧵∕;＊？“←→⸡"
+unblocked_chars="⧵∕;＊？“＜＞⸡"
 count=0
 
 def thumbnail(url,file_name):
     tn=wget.download(url,cover_path+"/"+file_name+".jpg")
+    print(tn)
 
     audio = MP3(audio_path+"/"+file_name+".mp3", ID3=ID3)
     # adding ID3 tag if it is not present
@@ -20,7 +21,6 @@ def thumbnail(url,file_name):
         pass
     
     audio.tags.add(APIC(mime='image/jpeg',type=3,desc=u'Cover',data=open(tn,'rb').read()))
-    print(file_name)
     # edit ID3 tags to open and read the picture from the path specified and assign it
     audio.save()  # save the current changes
 
@@ -73,25 +73,26 @@ def download_audio():
                     
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download(video_list[0],)
-            print("start")
-            
+               
         thumbnail(YouTube(video_list[0]).thumbnail_url,video_title)
         video_list.remove(link)
         
     else:
-        end=False
-        ydl_opts=opts('/%(title)s.%(ext)s')
-        for a in YouTube(video_list[0]).title:
-            if a in blocked_chars:
-                video_title=YouTube(video_list[0]).title.replace(a,unblocked_chars[blocked_chars.index(a)])
-                ydl_opts=opts("/"+video_title+".mp3")
                     
         for i in range(len(video_list)):
+            ydl_opts=opts('/%(title)s.%(ext)s')
+            video_title=YouTube(video_list[i]).title
+            for a in YouTube(video_list[i]).title:
+                if a in blocked_chars:
+                    video_title=YouTube(video_list[i]).title.replace(a,unblocked_chars[blocked_chars.index(a)])
+                    ydl_opts=opts("/"+video_title+".mp3")
+                    print(ydl_opts)
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 #download audio
                 ydl.download((video_list[i],))
-                
-            thumbnail(YouTube(video_list[i]).thumbnail_url,YouTube(video_list[i]).title)
+            
+            thumbnail(YouTube(video_list[i]).thumbnail_url,video_title)
+            print("\n\n"+YouTube(video_list[i]).thumbnail_url+"\n\n"+video_title)
 
 while True:
     download_audio()
